@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "FirefoxExtension (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "FirefoxExtension (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
