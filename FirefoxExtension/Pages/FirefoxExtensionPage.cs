@@ -2,6 +2,9 @@
 // The Microsoft Corporation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
+using System.Diagnostics;
+using FirefoxExtension.Pages;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 
@@ -19,7 +22,8 @@ internal sealed partial class FirefoxExtensionPage : ListPage
     public override IListItem[] GetItems()
     {
         return [
-            new ListItem(new NoOpCommand()) { Title = "TODO: Implement your extension here" }
+            new ListItem(new SearchHistoryPage()) { Title = "Search History", Subtitle = "Search through firefox history" },
+            new ListItem(new SearchBookmarksPage()) { Title = "Search Bookmarks", Subtitle = "Search through user bookmarks" }
         ];
     }
 }
