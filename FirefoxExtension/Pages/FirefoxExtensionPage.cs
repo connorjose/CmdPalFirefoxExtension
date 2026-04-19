@@ -23,7 +23,8 @@ internal sealed partial class FirefoxExtensionPage : ListPage
     {
         return [
             new ListItem(new SearchHistoryPage()) { Title = "Search History", Subtitle = "Search through firefox history" },
-            new ListItem(new SearchBookmarksPage()) { Title = "Search Bookmarks", Subtitle = "Search through user bookmarks" }
+            new ListItem(new SearchBookmarksPage()) { Title = "Search Bookmarks", Subtitle = "Search through user bookmarks" },
+            new ListItem(new SearchTabsPage()) { Title = "Search Tabs", Subtitle = "Search through open tabs" }
         ];
     }
 }

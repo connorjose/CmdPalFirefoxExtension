@@ -8,6 +8,9 @@ using Shmuelie.WinRTServer.CsWinRT;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FirefoxExtension.Data;
+using FirefoxExtension.Helpers;
+using System.IO;
 
 namespace FirefoxExtension;
 
@@ -38,6 +41,18 @@ public class Program
         else
         {
             Console.WriteLine("Not being launched as a Extension... exiting.");
+        }
+    }
+
+    private static async Task ComposeApp()
+    {
+        try
+        {
+            var dbService = new DbService(FileHelper.GetFirefoxDbPath());
+        } 
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing DbService: {ex.Message}");
         }
     }
 }
