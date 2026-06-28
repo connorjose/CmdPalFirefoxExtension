@@ -52,7 +52,12 @@ namespace FirefoxExtension.Data
 
         public IEnumerable<string> GetHistory()
         {
-            var historyItems = new List<string>();
+            return GetHistoryEntries().Select(entry => entry.Title ?? entry.Url);
+        }
+
+        public IEnumerable<HistoryEntry> GetHistoryEntries()
+        {
+            var historyItems = new List<HistoryEntry>();
 
             using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
             {
@@ -61,18 +66,20 @@ namespace FirefoxExtension.Data
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                    SELECT title
+                    SELECT COALESCE(title, url) AS title, url
                     FROM moz_places
                     WHERE visit_count > 0
                     ORDER BY last_visit_date DESC
-                    LIMIT 100
+                    LIMIT 50
                 ";
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        historyItems.Add(reader.GetString(0));
+                        var title = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+                        var url = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
+                        historyItems.Add(new HistoryEntry(title, url));
                     }
                 }
             }

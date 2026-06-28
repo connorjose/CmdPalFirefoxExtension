@@ -6,20 +6,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FirefoxExtension.Data;
 
 namespace FirefoxExtension.Pages
 {
     internal sealed partial class SearchHistoryPage : ListPage
     {
-        // TODO: Search history subset
+        private readonly List<ListItem> _items = new();
+        private readonly DbService? _dbService;
 
-        public SearchHistoryPage() 
+        public SearchHistoryPage(DbService? dbService) 
         {
+            _dbService = dbService;
             Icon = new("\uF147");
             Title = "Search history";
             Name = "Open";
 
-            _items = [new IncrementingListItem(this) { Subtitle = $"Item 0" }];
+            LoadHistoryItems();
         }
 
         public override IListItem[] GetItems()
@@ -27,12 +30,29 @@ namespace FirefoxExtension.Pages
             return _items.ToArray();
         }
 
-        internal void Increment() 
+        private void LoadHistoryItems()
         {
-            _items.Add(new IncrementingListItem(this) { Subtitle = $"Item {_items.Count}" });
-            RaiseItemsChanged();
-        }
+            _items.Clear();
 
-        private List<ListItem> _items;
+            if (_dbService is null)
+            {
+                _items.Add(new ListItem(new AnonymousCommand(action: () => { })) { Title = "Unable to load Firefox history", Subtitle = "Firefox profile could not be found." });
+                return;
+            }
+                
+
+            try
+            {
+
+                foreach (var entry in _dbService.GetHistoryEntries())
+                {
+                    _items.Add(new Commands.HistoryListItem(entry.Title, entry.Url));
+                }
+            }
+            catch
+            {
+                _items.Add(new ListItem(new AnonymousCommand(action: () => { })) { Title = "Unable to load Firefox history", Subtitle = "Check Firefox profile path or permissions." });
+            }
+        }
     }
 }
