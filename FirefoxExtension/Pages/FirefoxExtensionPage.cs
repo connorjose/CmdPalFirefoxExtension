@@ -28,7 +28,6 @@ internal sealed partial class FirefoxExtensionPage : ListPage
         return [
             new ListItem(new SearchHistoryPage(_dbService)) { Title = "Search History", Subtitle = "Search Firefox History", Icon = FirefoxIcon },
             new ListItem(new SearchBookmarksPage(_dbService)) { Title = "Search Bookmarks", Subtitle = "Search Firefox Bookmarks", Icon = FirefoxIcon },
-            new ListItem(new SearchTabsPage()) { Title = "Search Tabs", Subtitle = "Search Firefox Tabs", Icon = FirefoxIcon }
         ];
     }
 }
