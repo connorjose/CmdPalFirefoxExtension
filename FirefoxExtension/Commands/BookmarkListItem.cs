@@ -4,9 +4,9 @@ using Windows.System;
 
 namespace FirefoxExtension.Commands
 {
-    internal sealed partial class HistoryListItem : ListItem
+    internal sealed partial class BookmarkListItem : ListItem
     {
-        public HistoryListItem(string title, string url, IconInfo icon) : base(new NoOpCommand())
+        public BookmarkListItem(string title, string url, IconInfo icon) : base(new NoOpCommand())
         {
             Title = string.IsNullOrWhiteSpace(title) ? url : title;
             Subtitle = url;

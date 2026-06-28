@@ -13,11 +13,12 @@ namespace FirefoxExtension;
 
 internal sealed partial class FirefoxExtensionPage : ListPage
 {
+    private readonly IconInfo FirefoxIcon = IconHelpers.FromRelativePath("Assets\\FirefoxLogo.png");
     private readonly DbService? _dbService;
     public FirefoxExtensionPage(DbService? dbService)
     {
         _dbService = dbService;
-        Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
+        Icon = FirefoxIcon;
         Title = "Firefox Extension";
         Name = "Open";
     }
@@ -25,9 +26,9 @@ internal sealed partial class FirefoxExtensionPage : ListPage
     public override IListItem[] GetItems()
     {
         return [
-            new ListItem(new SearchHistoryPage(_dbService)) { Title = "Search History", Subtitle = "Search through firefox history" },
-            new ListItem(new SearchBookmarksPage()) { Title = "Search Bookmarks", Subtitle = "Search through user bookmarks" },
-            new ListItem(new SearchTabsPage()) { Title = "Search Tabs", Subtitle = "Search through open tabs" }
+            new ListItem(new SearchHistoryPage(_dbService)) { Title = "Search History", Subtitle = "Search Firefox History", Icon = FirefoxIcon },
+            new ListItem(new SearchBookmarksPage(_dbService)) { Title = "Search Bookmarks", Subtitle = "Search Firefox Bookmarks", Icon = FirefoxIcon },
+            new ListItem(new SearchTabsPage()) { Title = "Search Tabs", Subtitle = "Search Firefox Tabs", Icon = FirefoxIcon }
         ];
     }
 }

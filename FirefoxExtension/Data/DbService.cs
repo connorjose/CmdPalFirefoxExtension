@@ -23,7 +23,12 @@ namespace FirefoxExtension.Data
 
         public IEnumerable<string> GetBookmarks()
         {
-            var bookmarks = new List<string>();
+            return GetBookmarkEntries().Select(entry => entry.Title ?? entry.Url);
+        }
+
+        public IEnumerable<BookmarkEntry> GetBookmarkEntries()
+        {
+            var bookmarks = new List<BookmarkEntry>();
 
             using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
             {
@@ -32,17 +37,20 @@ namespace FirefoxExtension.Data
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                    SELECT b.title
+                    SELECT COALESCE(b.title, p.url) AS title, p.url
                     FROM moz_bookmarks b
                     JOIN moz_places p ON b.fk = p.id
                     WHERE b.type = 1
+                    ORDER BY b.dateAdded DESC
                 ";
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        bookmarks.Add(reader.GetString(0));
+                        var title = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+                        var url = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
+                        bookmarks.Add(new BookmarkEntry(title, url));
                     }
                 }
             }

@@ -18,7 +18,6 @@ namespace FirefoxExtension.Pages
         public SearchHistoryPage(DbService? dbService) 
         {
             _dbService = dbService;
-            Icon = new("\uF147");
             Title = "Search history";
             Name = "Open";
 
@@ -46,7 +45,7 @@ namespace FirefoxExtension.Pages
 
                 foreach (var entry in _dbService.GetHistoryEntries())
                 {
-                    _items.Add(new Commands.HistoryListItem(entry.Title, entry.Url));
+                    _items.Add(new Commands.HistoryListItem(entry.Title, entry.Url, IconHelpers.FromRelativePath("Assets\\FirefoxLogo.png")));
                 }
             }
             catch
