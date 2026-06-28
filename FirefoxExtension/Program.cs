@@ -8,6 +8,9 @@ using Shmuelie.WinRTServer.CsWinRT;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FirefoxExtension.Data;
+using FirefoxExtension.Helpers;
+using System.IO;
 
 namespace FirefoxExtension;
 

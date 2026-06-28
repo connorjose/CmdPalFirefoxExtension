@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using FirefoxExtension.Data;
 using FirefoxExtension.Pages;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
@@ -12,9 +13,12 @@ namespace FirefoxExtension;
 
 internal sealed partial class FirefoxExtensionPage : ListPage
 {
-    public FirefoxExtensionPage()
+    private readonly IconInfo FirefoxIcon = IconHelpers.FromRelativePath("Assets\\FirefoxLogo.png");
+    private readonly DbService? _dbService;
+    public FirefoxExtensionPage(DbService? dbService)
     {
-        Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
+        _dbService = dbService;
+        Icon = FirefoxIcon;
         Title = "Firefox Extension";
         Name = "Open";
     }
@@ -22,8 +26,8 @@ internal sealed partial class FirefoxExtensionPage : ListPage
     public override IListItem[] GetItems()
     {
         return [
-            new ListItem(new SearchHistoryPage()) { Title = "Search History", Subtitle = "Search through firefox history" },
-            new ListItem(new SearchBookmarksPage()) { Title = "Search Bookmarks", Subtitle = "Search through user bookmarks" }
+            new ListItem(new SearchHistoryPage(_dbService)) { Title = "Search History", Subtitle = "Search Firefox History", Icon = FirefoxIcon },
+            new ListItem(new SearchBookmarksPage(_dbService)) { Title = "Search Bookmarks", Subtitle = "Search Firefox Bookmarks", Icon = FirefoxIcon },
         ];
     }
 }
