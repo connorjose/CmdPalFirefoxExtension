@@ -44,7 +44,7 @@ namespace FirefoxExtension.Pages
             {
                 foreach (var entry in _dbService.GetBookmarkEntries())
                 {
-                    _items.Add(new Commands.BookmarkListItem(entry.Title, entry.Url, BookmarkIcon));
+                    _items.Add(new BookmarkListItem(entry.Title, entry.Url, BookmarkIcon));
                 }
             }
             catch

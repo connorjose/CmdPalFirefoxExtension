@@ -45,7 +45,7 @@ namespace FirefoxExtension.Pages
 
                 foreach (var entry in _dbService.GetHistoryEntries())
                 {
-                    _items.Add(new Commands.HistoryListItem(entry.Title, entry.Url, IconHelpers.FromRelativePath("Assets\\FirefoxLogo.png")));
+                    _items.Add(new HistoryListItem(entry.Title, entry.Url, IconHelpers.FromRelativePath("Assets\\FirefoxLogo.png")));
                 }
             }
             catch

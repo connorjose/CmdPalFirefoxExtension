@@ -7,6 +7,7 @@ using Microsoft.CommandPalette.Extensions.Toolkit;
 using FirefoxExtension.Data;
 using FirefoxExtension.Helpers;
 using System;
+using FirefoxExtension.Pages;
 
 
 namespace FirefoxExtension;
@@ -15,14 +16,15 @@ public partial class FirefoxExtensionCommandsProvider : CommandProvider
 {
     private readonly ICommandItem[] _commands;
     private DbService? _dbService;
+    private readonly IconInfo ExtensionIcon = IconHelpers.FromRelativePath("Assets\\FirefoxLogo.png");
 
     public FirefoxExtensionCommandsProvider()
     {
         InitDbService();
         DisplayName = "Firefox Extension";
-        Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
         _commands = [
-            new CommandItem(new FirefoxExtensionPage(_dbService)) { Title = DisplayName },
+            new CommandItem(new SearchHistoryPage(_dbService)) { Title = "Search History", Subtitle = "Search Firefox History", Icon = ExtensionIcon },
+            new CommandItem(new SearchBookmarksPage(_dbService)) { Title = "Search Bookmarks", Subtitle = "Search Firefox Bookmarks", Icon = ExtensionIcon },
         ];
     }
 
