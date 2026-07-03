@@ -26,23 +26,58 @@ namespace FirefoxExtension.Data
             return GetBookmarkEntries().Select(entry => entry.Title ?? entry.Url);
         }
 
-        public IEnumerable<BookmarkEntry> GetBookmarkEntries()
+        public int BookmarkCount
+        {
+            get
+            {
+                using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = "SELECT COUNT(1) FROM moz_bookmarks";
+                    return Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+        }
+
+        public IEnumerable<BookmarkEntry> GetBookmarkEntries(string? searchTerm = null, int limit = 200)
         {
             var bookmarks = new List<BookmarkEntry>();
 
             using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
             {
                 connection.Open();
-
                 var command = connection.CreateCommand();
-                command.CommandText =
-                @"
-                    SELECT COALESCE(b.title, p.url) AS title, p.url
-                    FROM moz_bookmarks b
-                    JOIN moz_places p ON b.fk = p.id
-                    WHERE b.type = 1
-                    ORDER BY b.dateAdded DESC
-                ";
+
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    command.CommandText =
+                    @"
+                        SELECT COALESCE(b.title, p.url) AS title, p.url
+                        FROM moz_bookmarks b
+                        JOIN moz_places p ON b.fk = p.id
+                        WHERE b.type = 1
+                        ORDER BY b.dateAdded DESC
+                        LIMIT @limit
+                    ";
+                    command.Parameters.AddWithValue("@limit", limit);
+                }
+                else
+                {
+                    command.CommandText =
+                    @"
+                        SELECT COALESCE(b.title, p.url) AS title, p.url
+                        FROM moz_bookmarks b
+                        JOIN moz_places p ON b.fk = p.id
+                        WHERE b.type = 1
+                            AND (b.title LIKE @contains ESCAPE '\' OR p.url LIKE @contains ESCAPE '\')
+                        ORDER BY b.dateAdded DESC
+                        LIMIT @limit
+                    ";
+                    var escaped = searchTerm.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+                    command.Parameters.AddWithValue("@contains", "%" + escaped + "%");
+                    command.Parameters.AddWithValue("@limit", limit);
+                }
 
                 using (var reader = command.ExecuteReader())
                 {
@@ -63,23 +98,45 @@ namespace FirefoxExtension.Data
             return GetHistoryEntries().Select(entry => entry.Title ?? entry.Url);
         }
 
-        public IEnumerable<HistoryEntry> GetHistoryEntries()
+        public IEnumerable<HistoryEntry> GetHistoryEntries(string? searchTerm = null, int limit = 100)
         {
             var historyItems = new List<HistoryEntry>();
 
             using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
             {
                 connection.Open();
-
                 var command = connection.CreateCommand();
-                command.CommandText =
-                @"
-                    SELECT COALESCE(title, url) AS title, url
-                    FROM moz_places
-                    WHERE visit_count > 0
-                    ORDER BY last_visit_date DESC
-                    LIMIT 50
-                ";
+
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    command.CommandText =
+                    @"
+                        SELECT COALESCE(title, url) AS title, url
+                        FROM moz_places
+                        WHERE visit_count > 0
+                        ORDER BY frecency DESC
+                        LIMIT @limit
+                    ";
+                    command.Parameters.AddWithValue("@limit", 50);
+                }
+                else
+                {
+                    // Cheap SQL-side prefilter: keep anything that contains the
+                    // characters in order somewhere (loose net), let the host's
+                    // fuzzy matcher do the real scoring/highlighting on the result.
+                    command.CommandText =
+                    @"
+                        SELECT COALESCE(title, url) AS title, url
+                        FROM moz_places
+                        WHERE visit_count > 0
+                            AND (title LIKE @contains ESCAPE '\' OR url LIKE @contains ESCAPE '\')
+                        ORDER BY frecency DESC
+                        LIMIT @limit
+                    ";
+                    var escaped = searchTerm.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+                    command.Parameters.AddWithValue("@contains", "%" + escaped + "%");
+                    command.Parameters.AddWithValue("@limit", limit);
+                }
 
                 using (var reader = command.ExecuteReader())
                 {
