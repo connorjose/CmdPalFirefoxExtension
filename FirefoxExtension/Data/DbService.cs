@@ -114,7 +114,7 @@ namespace FirefoxExtension.Data
                         SELECT COALESCE(title, url) AS title, url
                         FROM moz_places
                         WHERE visit_count > 0
-                        ORDER BY frecency DESC
+                        ORDER BY last_visit_date DESC
                         LIMIT @limit
                     ";
                     command.Parameters.AddWithValue("@limit", 50);
@@ -130,7 +130,7 @@ namespace FirefoxExtension.Data
                         FROM moz_places
                         WHERE visit_count > 0
                             AND (title LIKE @contains ESCAPE '\' OR url LIKE @contains ESCAPE '\')
-                        ORDER BY frecency DESC
+                        ORDER BY last_visit_date DESC
                         LIMIT @limit
                     ";
                     var escaped = searchTerm.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
